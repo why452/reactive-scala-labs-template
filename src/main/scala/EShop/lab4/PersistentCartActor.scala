@@ -30,7 +30,7 @@ class PersistentCartActor {
   def commandHandler(context: ActorContext[Command]): (State, Command) => Effect[Event, State] = (state, command) => {
     state match {
       case Empty =>
-        ???
+        ????
 
       case NonEmpty(cart, _) =>
         ???
