@@ -26,3 +26,4 @@ libraryDependencies ++= Seq(
 scalafmtOnCompile := true
 
 fork := true
+
