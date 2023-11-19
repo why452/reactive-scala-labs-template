@@ -14,13 +14,24 @@ class TypedCheckoutTest
   with Matchers
   with ScalaFutures {
 
-  import TypedCheckout._
-
   override def afterAll: Unit =
     testKit.shutdownTestKit()
 
   it should "Send close confirmation to cart" in {
-    ???
+    // Given
+    val orderManagerProbe = testKit.createTestProbe[OrderManager.Command]()
+    val typedCartProbe    = testKit.createTestProbe[TypedCartActor.Command]()
+    val typedCheckout     = testKit.spawn(new TypedCheckout(cartActor = typedCartProbe.ref).start).ref
+
+    // When
+    typedCheckout ! TypedCheckout.StartCheckout
+    typedCheckout ! TypedCheckout.SelectDeliveryMethod(method = "method")
+    typedCheckout ! TypedCheckout.SelectPayment(payment = "payment", orderManagerRef = orderManagerProbe.ref)
+    typedCheckout ! TypedCheckout.ConfirmPaymentReceived
+
+    // Then
+    orderManagerProbe.expectMessageType[OrderManager.ConfirmPaymentStarted]
+    typedCartProbe expectMessage TypedCartActor.ConfirmCheckoutClosed
   }
 
 }
