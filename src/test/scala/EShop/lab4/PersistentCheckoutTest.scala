@@ -238,3 +238,4 @@ class PersistentCheckoutTest
     resultCancelCheckout.state shouldBe Closed
   }
 }
+

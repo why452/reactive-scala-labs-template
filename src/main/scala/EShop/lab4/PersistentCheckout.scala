@@ -34,7 +34,7 @@ class PersistentCheckout {
   ): (State, Command) => Effect[Event, State] = (state, command) => {
     state match {
       case WaitingForStart =>
-        ???
+        ????
 
       case SelectingDelivery(_) =>
         ???
