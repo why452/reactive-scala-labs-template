@@ -237,5 +237,34 @@ class PersistentCheckoutTest
     resultCancelCheckout.hasNoEvents shouldBe true
     resultCancelCheckout.state shouldBe Closed
   }
-}
 
+  it should "be in selecting delivery state after actor restart" in {
+    val resultStartCheckout = eventSourcedTestKit.runCommand(StartCheckout)
+
+    resultStartCheckout.event shouldBe CheckoutStarted
+    resultStartCheckout.state.isInstanceOf[SelectingDelivery] shouldBe true
+
+    val restartedResult = eventSourcedTestKit.restart()
+    restartedResult.state.isInstanceOf[SelectingDelivery] shouldBe true
+  }
+
+  it should "be in processing payment state after payment selected and actor restarted" in {
+    val resultStartCheckout = eventSourcedTestKit.runCommand(StartCheckout)
+
+    resultStartCheckout.event shouldBe CheckoutStarted
+    resultStartCheckout.state.isInstanceOf[SelectingDelivery] shouldBe true
+
+    val resultSelectDelivery = eventSourcedTestKit.runCommand(SelectDeliveryMethod(deliveryMethod))
+
+    resultSelectDelivery.event.isInstanceOf[DeliveryMethodSelected] shouldBe true
+    resultSelectDelivery.state.isInstanceOf[SelectingPaymentMethod] shouldBe true
+
+    val restartedResult = eventSourcedTestKit.restart()
+    restartedResult.state.isInstanceOf[SelectingPaymentMethod] shouldBe true
+
+    val resultSelectPayment = eventSourcedTestKit.runCommand(SelectPayment(paymentMethod, orderManagerProbe.ref))
+
+    resultSelectPayment.event.isInstanceOf[PaymentStarted] shouldBe true
+    resultSelectPayment.state.isInstanceOf[ProcessingPayment] shouldBe true
+  }
+}
