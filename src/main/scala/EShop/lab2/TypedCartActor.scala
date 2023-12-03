@@ -121,11 +121,11 @@ class TypedCartActor {
     )
 
   private def onRemoveItem(
-    cart: Cart,
-    item: Any,
-    timer: Cancellable,
-    context: ActorContext[Command]
-  ): Behavior[Command] = {
+                            cart: Cart,
+                            item: Any,
+                            timer: Cancellable,
+                            context: ActorContext[Command]
+                          ): Behavior[Command] = {
     val newCart = cart removeItem item
 
     def isElementRemoved = cart.size != newCart.size

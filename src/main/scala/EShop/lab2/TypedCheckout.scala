@@ -25,6 +25,10 @@ object TypedCheckout {
 
   case object ConfirmPaymentReceived extends Command
 
+  case object PaymentRejected extends Command
+
+  case object PaymentRestarted extends Command
+
   sealed trait Event
 
   case object CheckOutClosed extends Event
@@ -54,8 +58,8 @@ object TypedCheckout {
 }
 
 class TypedCheckout(
-  cartActor: ActorRef[TypedCartActor.Command]
-) {
+                     cartActor: ActorRef[TypedCartActor.Command]
+                   ) {
   import TypedCheckout._
 
   val checkoutTimerDuration: FiniteDuration = 1 seconds

@@ -16,6 +16,8 @@ object OrderManager {
   case class ConfirmPaymentStarted(paymentRef: ActorRef[Payment.Command])                             extends Command
   case object ConfirmPaymentReceived                                                                  extends Command
   case object ConfirmCheckOutClosed                                                                   extends Command
+  case object PaymentRejected extends Command
+  case object PaymentRestarted extends Command
 
   sealed trait Ack
   case object Done extends Ack //trivial ACK
@@ -56,9 +58,9 @@ class OrderManager {
     )
 
   def inCheckout(
-    cartActorRef: ActorRef[TypedCartActor.Command],
-    senderRef: ActorRef[Ack]
-  ): Behavior[OrderManager.Command] =
+                  cartActorRef: ActorRef[TypedCartActor.Command],
+                  senderRef: ActorRef[Ack]
+                ): Behavior[OrderManager.Command] =
     Behaviors.receiveMessage {
       case ConfirmCheckoutStarted(checkoutRef) =>
         senderRef ! Done
@@ -93,9 +95,9 @@ class OrderManager {
     }
 
   def inPayment(
-    paymentActorRef: ActorRef[Payment.Command],
-    senderRef: ActorRef[Ack]
-  ): Behavior[OrderManager.Command] =
+                 paymentActorRef: ActorRef[Payment.Command],
+                 senderRef: ActorRef[Ack]
+               ): Behavior[OrderManager.Command] =
     Behaviors.receiveMessage {
       case Pay(sender) =>
         paymentActorRef ! Payment.DoPayment
